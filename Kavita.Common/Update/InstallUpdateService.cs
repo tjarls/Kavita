@@ -42,17 +42,46 @@ namespace Kavita.Common.Update
         }
         public async Task CheckForUpdates()
         {
-            _logger.LogInformation("Checking for Updates");
-            var latestAvailable = await _checkUpdateService.AvailableUpdate();
-            if (latestAvailable == null)
+            try
             {
-                _logger.LogInformation("No update found");
-                return;
-            }
-            
-            _logger.LogInformation("Found Update {Version}", latestAvailable.Version);
+                // TODO: Check if AutoUpdate is enabled && Not a docker user
 
-            var successful = await InstallUpdate(latestAvailable);
+                _logger.LogInformation("Checking for Updates");
+                var latestAvailable = await _checkUpdateService.AvailableUpdate();
+                if (latestAvailable == null)
+                {
+                    _logger.LogInformation("No update found");
+                    return;
+                }
+
+                _logger.LogInformation("Found Update {Version}", latestAvailable.Version);
+
+                var installing = await InstallUpdate(latestAvailable);
+
+                if (installing)
+                {
+                    _logger.LogDebug("Install in progress, giving installer 30 seconds.");
+
+                    var watch = Stopwatch.StartNew();
+
+                    while (watch.Elapsed < TimeSpan.FromSeconds(30))
+                    {
+                        Thread.Sleep(1000);
+                    }
+
+                    _logger.LogError(
+                        "Post-install update not completed within 30 seconds. Attempting to continue normal operation.");
+                }
+                else
+                {
+                    _logger.LogDebug(
+                        "Post-install update cancelled for unknown reason. Attempting to continue normal operation.");
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to perform the post-install update check. Attempting to continue normal operation");
+            }
         }
 
         private async Task<bool> InstallUpdate(UpdatePackage updatePackage)
@@ -62,7 +91,7 @@ namespace Kavita.Common.Update
             // Copy/Merge appsettings.json over and copy DB
             // Delete source directory (make sure backup, etc aren't touched)
             // Copy extracted data back over. 
-            
+
             _logger.LogInformation("Downloading update {0}", updatePackage.Version);
             _logger.LogDebug("Downloading update package from [{0}] to [{1}]", updatePackage.Url, DownloadDirectory);
             var path = await updatePackage.Url
@@ -79,9 +108,6 @@ namespace Kavita.Common.Update
             _logger.LogInformation("Update package verified successfully");
 
             _logger.LogInformation("Extracting Update package");
-            //using ZipArchive archive = ZipFile.OpenRead(path);
-            //archive.ExtractToDirectory(UpdateDirectory); // only works for zips
-            //_diskService.DeleteFolder(UpdateDirectory, true);
             new DirectoryInfo(UpdateDirectory).Delete(true);
             _diskService.ExistOrCreate(UpdateDirectory);
             using var archive = ArchiveFactory.Open(path);
@@ -100,10 +126,22 @@ namespace Kavita.Common.Update
             // TODO: Backup my own directory completely
             
             // Perform the final move and somehow stop this service and have new one start
-            
-            
-            //_diskService.DeleteFolder(UpdateDirectory, true);
             //_backupService.Backup(BackupType.Update);
+            
+            _logger.LogInformation("Preparing client");
+            // _diskTransferService.TransferFolder(_appFolderInfo.GetUpdateClientFolder(), updateSandboxFolder, TransferMode.Move);
+            //
+            // // Set executable flag on update app
+            // if (OsInfo.IsOsx || (OsInfo.IsLinux && PlatformInfo.IsNetCore))
+            // {
+            //     _diskProvider.SetFilePermissions(_appFolderInfo.GetUpdateClientExePath(updatePackage.Runtime), "755", null);
+            // }
+            //
+            // _logger.LogInformation("Starting update client {0}", _appFolderInfo.GetUpdateClientExePath(updatePackage.Runtime));
+            // _logger.LogInformation("Kavita will restart shortly.");
+            //
+            // _processProvider.Start(_appFolderInfo.GetUpdateClientExePath(updatePackage.Runtime), GetUpdaterArgs(updateSandboxFolder));
+            
             return true;
         }
 

@@ -65,5 +65,15 @@ namespace Kavita.Common.Extensions
 
             return Directory.GetParent(cleanPath)?.FullName;
         }
+        
+        public static string ProcessNameToExe(this string processName, PlatformType runtime)
+        {
+            if (OsInfo.IsWindows || runtime != PlatformType.NetCore)
+            {
+                processName += ".exe";
+            }
+
+            return processName;
+        }
     }
 }
