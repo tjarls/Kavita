@@ -2,6 +2,7 @@
 using System.IO;
 using System.Threading.Tasks;
 
+
 namespace API.Interfaces.Services
 {
     public interface IDirectoryService
@@ -25,5 +26,6 @@ namespace API.Interfaces.Services
 
         IEnumerable<string> GetFiles(string path, string searchPatternExpression = "",
             SearchOption searchOption = SearchOption.TopDirectoryOnly);
+        
     }
 }

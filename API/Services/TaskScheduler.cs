@@ -1,10 +1,13 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Threading.Tasks;
 using API.Entities.Enums;
 using API.Helpers.Converters;
 using API.Interfaces;
 using API.Interfaces.Services;
 using Hangfire;
+using Kavita.Common.EnvironmentInfo;
+using Kavita.Common.Update;
 using Microsoft.Extensions.Logging;
 
 namespace API.Services
@@ -96,6 +99,16 @@ namespace API.Services
 
         #endregion
 
+        #region UpdateTasks
+
+        public void ScheduleUpdaterTasks()
+        {
+            _logger.LogInformation("Scheduling Auto-Update tasks");
+            //RecurringJob.AddOrUpdate("check-updates", () => {InstallUpdateService}, Cron.Daily);
+            
+        }
+        #endregion
+        
         public void ScanLibrary(int libraryId, bool forceUpdate = false)
         {
             _logger.LogInformation("Enqueuing library scan for: {LibraryId}", libraryId);

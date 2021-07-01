@@ -95,6 +95,11 @@ namespace API.Services
           return !Directory.Exists(path) ? Array.Empty<string>() : Directory.GetFiles(path);
        }
 
+       public int MirrorFolder(string source, string target)
+       {
+          throw new NotImplementedException();
+       }
+
        public string[] GetFilesWithExtension(string path, string searchPatternExpression = "")
        {
           if (searchPatternExpression != string.Empty)

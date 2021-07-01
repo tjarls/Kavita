@@ -13,5 +13,6 @@
         void RefreshSeriesMetadata(int libraryId, int seriesId);
         void ScheduleStatsTasks();
         void CancelStatsTasks();
+        void ScheduleUpdaterTasks();
     }
 }

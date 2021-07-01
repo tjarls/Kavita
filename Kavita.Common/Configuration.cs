@@ -2,11 +2,19 @@
 using System.IO;
 using System.Text.Json;
 using Kavita.Common.EnvironmentInfo;
+using Microsoft.Extensions.Hosting;
 
 namespace Kavita.Common
 {
     public static class Configuration
     {
+        public static string GetAppSettingFilename()
+        {
+            var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+            var isDevelopment = environment == Environments.Development;
+            return "appsettings" + (isDevelopment ? ".Development" : "") + ".json";
+        }
+        
         #region JWT Token
         public static bool CheckIfJwtTokenSet(string filePath)
         {
@@ -65,6 +73,7 @@ namespace Kavita.Common
         }
         public static int GetPort(string filePath)
         {
+            Console.WriteLine(GetAppSettingFilename());
             const int defaultPort = 5000;
             if (new OsInfo(Array.Empty<IOsVersionAdapter>()).IsDocker)
             {
@@ -130,5 +139,40 @@ namespace Kavita.Common
             return "Information";
         }
         #endregion
+        
+        public static string GetBranch(string filePath)
+        {
+            const string defaultBranch = "main";
+
+            try {
+                var json = File.ReadAllText(filePath);
+                var jsonObj = JsonSerializer.Deserialize<dynamic>(json);
+                const string key = "Branch";
+                
+                if (jsonObj.TryGetProperty(key, out JsonElement tokenElement))
+                {
+                    return tokenElement.GetString();
+                }
+            }
+            catch (Exception ex) {
+                Console.WriteLine("Error reading app settings: " + ex.Message);
+            }
+
+            return defaultBranch;
+        }
+        public static bool SetBranch(string filePath, string updatedBranch)
+        {
+            try
+            {
+                var currentBranch = GetBranch(filePath);
+                var json = File.ReadAllText(filePath).Replace("\"Branch\": " + currentBranch, "\"Port\": " + updatedBranch);
+                File.WriteAllText(filePath, json);
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
     }
 }
