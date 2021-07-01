@@ -13,6 +13,7 @@
       <PackageReference Include="Flurl.Http" Version="3.2.0" />
       <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="5.0.0" />
       <PackageReference Include="Sentry" Version="3.3.4" />
+      <PackageReference Include="SharpCompress" Version="0.28.1" />
       <PackageReference Include="System.IO.Abstractions" Version="13.2.38" />
     </ItemGroup>
 

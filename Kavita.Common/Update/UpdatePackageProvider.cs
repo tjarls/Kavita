@@ -16,11 +16,11 @@ namespace Kavita.Common.Update
         Task<List<UpdatePackage>> GetRecentUpdates(string branch, Version currentVersion);
     }
     
-    public class UpdatePackageProvider
+    public class UpdatePackageProvider : IUpdatePackageProvider
     {
         private readonly HttpClient _httpClient;
         private readonly IPlatformInfo _platformInfo;
-        private static string UpdateApi = "http://update.kavitareader.com"; // TODO: Move this into a central point
+        private static string UpdateApi = "http://localhost/v1"; // TODO: Move this into a central point (update.kavitareader.com)
 
         public UpdatePackageProvider(HttpClient httpClient, IPlatformInfo platformInfo)
         {

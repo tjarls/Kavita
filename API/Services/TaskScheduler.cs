@@ -23,13 +23,14 @@ namespace API.Services
         private readonly ICleanupService _cleanupService;
 
         private readonly IStatsService _statsService;
+        private readonly IInstallUpdateService _installUpdateService;
 
         public static BackgroundJobServer Client => new BackgroundJobServer();
 
 
         public TaskScheduler(ICacheService cacheService, ILogger<TaskScheduler> logger, IScannerService scannerService, 
             IUnitOfWork unitOfWork, IMetadataService metadataService, IBackupService backupService,
-            ICleanupService cleanupService, IStatsService statsService)
+            ICleanupService cleanupService, IStatsService statsService, IInstallUpdateService installUpdateService)
         {
             _cacheService = cacheService;
             _logger = logger;
@@ -39,6 +40,7 @@ namespace API.Services
             _backupService = backupService;
             _cleanupService = cleanupService;
             _statsService = statsService;
+            _installUpdateService = installUpdateService;
         }
 
         public void ScheduleTasks()
@@ -104,7 +106,7 @@ namespace API.Services
         public void ScheduleUpdaterTasks()
         {
             _logger.LogInformation("Scheduling Auto-Update tasks");
-            //RecurringJob.AddOrUpdate("check-updates", () => {InstallUpdateService}, Cron.Daily);
+            RecurringJob.AddOrUpdate("check-updates", () => _installUpdateService.CheckForUpdates(), Cron.Daily);
             
         }
         #endregion

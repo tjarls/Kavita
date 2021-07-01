@@ -1,10 +1,14 @@
-﻿using API.Data;
+﻿using System.IO.Abstractions;
+using API.Data;
 using API.Helpers;
 using API.Interfaces;
 using API.Interfaces.Services;
 using API.Services;
 using API.Services.Tasks;
 using Kavita.Common;
+using Kavita.Common.Disk;
+using Kavita.Common.EnvironmentInfo;
+using Kavita.Common.Update;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -31,6 +35,16 @@ namespace API.Extensions
             services.AddScoped<IBackupService, BackupService>();
             services.AddScoped<ICleanupService, CleanupService>();
             services.AddScoped<IBookService, BookService>();
+            
+            // services from other projects
+            services.AddScoped<IInstallUpdateService, InstallUpdateService>();
+            services.AddScoped<ICheckUpdateService, UpdateCheckService>();
+            services.AddScoped<IUpdatePackageProvider, UpdatePackageProvider>();
+            services.AddScoped<IPlatformInfo, PlatformInfo>();
+            services.AddScoped<IOsInfo, OsInfo>();
+            services.AddScoped<IDiskService, DiskService>();
+            services.AddScoped<IFileSystem, FileSystem>();
+            services.AddScoped<IVerifyUpdates, UpdateVerification>();
 
             services.AddSqLite(config, env);
 

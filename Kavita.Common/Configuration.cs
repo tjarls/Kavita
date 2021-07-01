@@ -8,6 +8,30 @@ namespace Kavita.Common
 {
     public static class Configuration
     {
+        public static string Branch
+        {
+            get => GetBranch(GetAppSettingFilename());
+            set => SetBranch(GetAppSettingFilename(), value);
+        }
+
+        public static int Port
+        {
+            get => GetPort(GetAppSettingFilename());
+            set => SetPort(GetAppSettingFilename(), value);
+        }
+        
+        public static string JwtToken
+        {
+            get => GetJwtToken(GetAppSettingFilename());
+            set => SetJwtToken(GetAppSettingFilename(), value);
+        }
+
+        public static string LogLevel
+        {
+            get => GetLogLevel(GetAppSettingFilename());
+            set => SetLogLevel(GetAppSettingFilename(), value);
+        }
+        
         public static string GetAppSettingFilename()
         {
             var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
@@ -16,7 +40,8 @@ namespace Kavita.Common
         }
         
         #region JWT Token
-        public static bool CheckIfJwtTokenSet(string filePath)
+
+        public static string GetJwtToken(string filePath)
         {
             try {
                 var json = File.ReadAllText(filePath);
@@ -25,10 +50,46 @@ namespace Kavita.Common
                 
                 if (jsonObj.TryGetProperty(key, out JsonElement tokenElement))
                 {
-                    return tokenElement.GetString() != "super secret unguessable key";
+                    return tokenElement.GetString();
                 }
 
+                return string.Empty;
+                
+            }
+            catch (Exception ex) {
+                Console.WriteLine("Error reading app settings: " + ex.Message);
+            }
+
+            return string.Empty;
+        }
+
+        public static bool SetJwtToken(string filePath, string token)
+        {
+            try
+            {
+                var currentToken = GetJwtToken(filePath);
+                var json = File.ReadAllText(filePath).Replace("\"TokenKey\": \"" + currentToken, "\"TokenKey\": \"" + token);
+                File.WriteAllText(filePath, json);
+                return true;
+            }
+            catch (Exception)
+            {
                 return false;
+            }
+        }
+        public static bool CheckIfJwtTokenSet(string filePath)
+        {
+            try {
+                // var json = File.ReadAllText(filePath);
+                // var jsonObj = JsonSerializer.Deserialize<dynamic>(json);
+                // const string key = "TokenKey";
+                //
+                // if (jsonObj.TryGetProperty(key, out JsonElement tokenElement))
+                // {
+                //     return tokenElement.GetString() != "super secret unguessable key";
+                // }
+
+                return GetJwtToken(filePath) != "super secret unguessable key";
                 
             }
             catch (Exception ex) {
@@ -39,6 +100,7 @@ namespace Kavita.Common
         }
         public static bool UpdateJwtToken(string filePath, string token)
         {
+            // TODO: Refactor the invoker to use SetJwtToken
             try
             {
                 var json = File.ReadAllText(filePath).Replace("super secret unguessable key", token);
@@ -52,7 +114,7 @@ namespace Kavita.Common
         }
         #endregion
         #region Port
-        public static bool UpdatePort(string filePath, int port)
+        public static bool SetPort(string filePath, int port)
         {
             if (new OsInfo(Array.Empty<IOsVersionAdapter>()).IsDocker)
             {
@@ -98,7 +160,7 @@ namespace Kavita.Common
         }
         #endregion
         #region LogLevel
-        public static bool UpdateLogLevel(string filePath, string logLevel)
+        public static bool SetLogLevel(string filePath, string logLevel)
         {
             try
             {
@@ -165,7 +227,7 @@ namespace Kavita.Common
             try
             {
                 var currentBranch = GetBranch(filePath);
-                var json = File.ReadAllText(filePath).Replace("\"Branch\": " + currentBranch, "\"Port\": " + updatedBranch);
+                var json = File.ReadAllText(filePath).Replace("\"Branch\": " + currentBranch, "\"Branch\": " + updatedBranch);
                 File.WriteAllText(filePath, json);
                 return true;
             }

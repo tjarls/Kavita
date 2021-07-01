@@ -80,14 +80,14 @@ namespace API.Controllers
                 {
                     setting.Value = updateSettingsDto.Port + "";
                     // Port is managed in appSetting.json
-                    Configuration.UpdatePort(Program.GetAppSettingFilename(), updateSettingsDto.Port);
+                    Configuration.SetPort(Program.GetAppSettingFilename(), updateSettingsDto.Port);
                     _unitOfWork.SettingsRepository.Update(setting);
                 }
                 
                 if (setting.Key == ServerSettingKey.LoggingLevel && updateSettingsDto.LoggingLevel + "" != setting.Value)
                 {
                     setting.Value = updateSettingsDto.LoggingLevel + "";
-                    Configuration.UpdateLogLevel(Program.GetAppSettingFilename(), updateSettingsDto.LoggingLevel);
+                    Configuration.SetLogLevel(Program.GetAppSettingFilename(), updateSettingsDto.LoggingLevel);
                     _unitOfWork.SettingsRepository.Update(setting);
                 }
                 
