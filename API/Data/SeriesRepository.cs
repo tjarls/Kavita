@@ -422,5 +422,18 @@ namespace API.Data
                 .AsNoTracking()
                 .ToListAsync();
         }
+        /// <summary>
+        /// Pulls all series for ids given including full volume, chapter information. This is expensive.
+        /// </summary>
+        /// <param name="seriesIds"></param>
+        /// <returns></returns>
+        public async Task<IList<Series>> GetFullSeriesByIds(int[] seriesIds)
+        {
+            return await _context.Series
+                .Where(s => seriesIds.Contains(s.Id))
+                .Include(s => s.Volumes)
+                .ThenInclude(v => v.Chapters)
+                .ToListAsync();
+        }
     }
 }

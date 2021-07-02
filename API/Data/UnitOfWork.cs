@@ -27,7 +27,7 @@ namespace API.Data
 
         public ISettingsRepository SettingsRepository => new SettingsRepository(_context, _mapper);
 
-        public IAppUserProgressRepository AppUserProgressRepository => new AppUserProgressRepository(_context);
+        public IAppUserProgressRepository AppUserProgressRepository => new AppUserProgressRepository(_context, _mapper);
         public ICollectionTagRepository CollectionTagRepository => new CollectionTagRepository(_context, _mapper);
         public IFileRepository FileRepository => new FileRepository(_context);
 

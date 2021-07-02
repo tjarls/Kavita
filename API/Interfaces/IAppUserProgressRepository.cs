@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using API.DTOs.Export;
 using API.Entities.Enums;
 
 namespace API.Interfaces
@@ -7,5 +9,6 @@ namespace API.Interfaces
     {
         Task<int> CleanupAbandonedChapters();
         Task<bool> UserHasProgress(LibraryType libraryType, int userId);
+        Task<IEnumerable<ProgressReportDto>> GetAllProgressDto();
     }
 }

@@ -31,6 +31,7 @@ namespace API.Extensions
             services.AddScoped<IBackupService, BackupService>();
             services.AddScoped<ICleanupService, CleanupService>();
             services.AddScoped<IBookService, BookService>();
+            services.AddScoped<IProgressService, ProgressService>();
 
             services.AddSqLite(config, env);
 

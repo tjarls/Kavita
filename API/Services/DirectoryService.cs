@@ -16,6 +16,9 @@ namespace API.Services
        private static readonly Regex ExcludeDirectories = new Regex(
           @"@eaDir|\.DS_Store", 
           RegexOptions.Compiled | RegexOptions.IgnoreCase);
+       
+       public static readonly string TempDirectory = Path.Join(Directory.GetCurrentDirectory(), "temp");
+       
 
        public DirectoryService(ILogger<DirectoryService> logger)
        {

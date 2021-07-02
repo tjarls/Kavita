@@ -19,7 +19,7 @@ namespace API.Services.Tasks
         private readonly IUnitOfWork _unitOfWork;
         private readonly ILogger<BackupService> _logger;
         private readonly IDirectoryService _directoryService;
-        private readonly string _tempDirectory = Path.Join(Directory.GetCurrentDirectory(), "temp");
+        private readonly string _tempDirectory = DirectoryService.TempDirectory;
 
         private readonly IList<string> _backupFiles;
 
