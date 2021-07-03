@@ -75,5 +75,10 @@ namespace Kavita.Common.Extensions
 
             return processName;
         }
+        
+        public static string ProcessNameToExe(this string processName)
+        {
+            return processName.ProcessNameToExe(PlatformInfo.Platform);
+        }
     }
 }

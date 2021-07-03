@@ -146,6 +146,8 @@ namespace API.Tests.Parser
         [InlineData("Kodoja #001 (March 2016)", "Kodoja")]
         [InlineData("Boku No Kokoro No Yabai Yatsu - Chapter 054 I Prayed At The Shrine (V0).cbz", "Boku No Kokoro No Yabai Yatsu")]
         [InlineData("Kiss x Sis - Ch.36 - A Cold Home Visit.cbz", "Kiss x Sis")]
+        [InlineData("Seraph of the End - Vampire Reign 093  (2020) (Digital) (LuCaZ)", "Seraph of the End - Vampire Reign")]
+        [InlineData("Grand Blue Dreaming - SP02 Extra (2019) (Digital) (danke-Empire).cbz", "Grand Blue Dreaming")]
         public void ParseSeriesTest(string filename, string expected)
         {
             Assert.Equal(expected, API.Parser.Parser.ParseSeries(filename));
