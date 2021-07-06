@@ -2,11 +2,13 @@
 using System.Diagnostics;
 using System.IO;
 using System.Net.Http;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Flurl.Http;
 using Kavita.Common.Disk;
 using Kavita.Common.EnvironmentInfo;
+using Kavita.Common.Extensions;
 using Kavita.Common.Processes;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -153,11 +155,20 @@ namespace Kavita.Common.Update
             
             _logger.LogInformation("Starting update client {ExecutablePath}", executablePath);
             _logger.LogInformation("Kavita will restart shortly");
-            _processProvider.Start(executablePath);  
+            _processProvider.Start(executablePath, GetUpdaterArgs(UpdateDirectory));  
             
             
             
             return true;
+        }
+        
+        private string GetUpdaterArgs(string updateSandboxFolder)
+        {
+            var processId = _processProvider.GetCurrentProcess().Id.ToString();
+            var executingApplication = Assembly.GetEntryAssembly()?.Location;
+            var args = string.Join(" ", processId, updateSandboxFolder.TrimEnd(Path.DirectorySeparatorChar).WrapInQuotes(), executingApplication.WrapInQuotes());
+            _logger.LogInformation("Updater Arguments: " + args);
+            return args;
         }
 
         /// <summary>

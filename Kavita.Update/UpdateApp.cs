@@ -14,8 +14,6 @@ namespace Kavita.Update
         private readonly ILoggerFactory _logfactory;
         private static ILogger _logger;
 
-        //private static IContainer _container;
-
         public UpdateApp(UpdateEngine.InstallUpdateService installUpdateService, IProcessProvider processProvider)
         {
             _installUpdateService = installUpdateService;
@@ -31,7 +29,8 @@ namespace Kavita.Update
                 //var startupContext = new StartupContext(args);
                 //TODO: NzbDroneLogger.Register(startupContext, true, true);
 
-                _logger.LogInformation("Starting Kavita Update Client");
+                //_logger.LogInformation("Starting Kavita Update Client");
+                System.Console.WriteLine("Starting Kavita Update Client");
 
                 // _container = UpdateContainerBuilder.Build(startupContext);
                 // _container.Resolve<InitializeLogger>().Initialize();
@@ -42,8 +41,10 @@ namespace Kavita.Update
                 // copy the files over for
                 // then delete backup and return
                 // if exception, perform rollback
+                // I need DI here
+                UpdateApp.Start(args);
 
-                _logger.LogInformation("Update completed successfully");
+                //_logger.LogInformation("Update completed successfully");
             }
             catch (Exception ex)
             {
@@ -51,7 +52,7 @@ namespace Kavita.Update
             }
         }
         
-        public void Start(string[] args)
+        public static void Start(string[] args)
         {
             //var startupContext = ParseArgs(args);
             var targetFolder = Directory.GetCurrentDirectory();
