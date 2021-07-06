@@ -8,6 +8,7 @@ using Flurl.Http;
 using Kavita.Common.Disk;
 using Kavita.Common.EnvironmentInfo;
 using Kavita.Common.Processes;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using SharpCompress.Archives;
 using SharpCompress.Common;
@@ -25,18 +26,20 @@ namespace Kavita.Common.Update
         private readonly ILogger<InstallUpdateService> _logger;
         private readonly IVerifyUpdates _updateVerifier;
         private readonly IProcessProvider _processProvider;
+        private readonly IHostEnvironment _environment;
         private static readonly string DownloadDirectory = Path.Join(Directory.GetCurrentDirectory(), "temp/downloads");
         private static readonly string UpdateDirectory = Path.Join(Directory.GetCurrentDirectory(), "temp/update");
 
         public InstallUpdateService(ICheckUpdateService checkUpdateService, IDiskService diskService, 
             ILogger<InstallUpdateService> logger, IVerifyUpdates updateVerifier, 
-            IProcessProvider processProvider)
+            IProcessProvider processProvider, IHostEnvironment environment)
         {
             _checkUpdateService = checkUpdateService;
             _diskService = diskService;
             _logger = logger;
             _updateVerifier = updateVerifier;
             _processProvider = processProvider;
+            _environment = environment;
         }
         public async Task CheckForUpdates()
         {
@@ -106,7 +109,11 @@ namespace Kavita.Common.Update
             _logger.LogInformation("Update package verified successfully");
 
             _logger.LogInformation("Extracting Update package");
-            new DirectoryInfo(UpdateDirectory).Delete(true);
+            var dir = new DirectoryInfo(UpdateDirectory);
+            if (dir.Exists)
+            {
+                dir.Delete(true);
+            }
             _diskService.ExistOrCreate(UpdateDirectory);
             using var archive = ArchiveFactory.Open(path);
             archive.WriteToDirectory(UpdateDirectory, new ExtractionOptions()
@@ -137,10 +144,18 @@ namespace Kavita.Common.Update
             // }
             //
             // TODO: _appFolderInfo.GetUpdateClientExePath(updatePackage.Runtime)
-            _logger.LogInformation("Starting update client {0}", "KavitaUpdate.exe");
-            _logger.LogInformation("Kavita will restart shortly");
             
-            _processProvider.Start(Path.Join(Directory.GetCurrentDirectory(), "KavitaUpdate.exe"));
+            
+            var executablePath = _environment.IsDevelopment()
+                ? Path.Join(Directory.GetCurrentDirectory(), @"..\Kavita.Update\bin\Debug\net5.0\Kavita.Update.exe")
+                : Path.Join(Directory.GetCurrentDirectory(), "Kavita.Update.exe");
+            executablePath = Path.GetFullPath(executablePath);
+            
+            _logger.LogInformation("Starting update client {ExecutablePath}", executablePath);
+            _logger.LogInformation("Kavita will restart shortly");
+            _processProvider.Start(executablePath);  
+            
+            
             
             return true;
         }

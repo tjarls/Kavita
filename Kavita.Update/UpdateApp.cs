@@ -2,26 +2,25 @@
 using System.ComponentModel;
 using System.IO;
 using Kavita.Common.Processes;
-using Kavita.Common.Update;
 using Microsoft.Extensions.Logging;
 
 namespace Kavita.Update
 {
     public class UpdateApp
     {
-        private readonly Kavita.Update.UpdateEngine.InstallUpdateService _installUpdateService;
+        private readonly UpdateEngine.InstallUpdateService _installUpdateService;
         private readonly IProcessProvider _processProvider;
         
         private readonly ILoggerFactory _logfactory;
         private static ILogger _logger;
 
-        private static IContainer _container;
+        //private static IContainer _container;
 
-        public UpdateApp(Kavita.Update.UpdateEngine.InstallUpdateService installUpdateService, IProcessProvider processProvider)
+        public UpdateApp(UpdateEngine.InstallUpdateService installUpdateService, IProcessProvider processProvider)
         {
             _installUpdateService = installUpdateService;
             _processProvider = processProvider;
-            _logfactory = (ILoggerFactory) new LoggerFactory();
+            _logfactory = new LoggerFactory();
             _logger = new Logger<UpdateApp>(_logfactory);
         }
 
@@ -37,6 +36,12 @@ namespace Kavita.Update
                 // _container = UpdateContainerBuilder.Build(startupContext);
                 // _container.Resolve<InitializeLogger>().Initialize();
                 // _container.Resolve<UpdateApp>().Start(args);
+                
+                // What this needs to do is open the API/temp directory and check if the update/ folder exists
+                // if so, backup current directory to temp/backup/
+                // copy the files over for
+                // then delete backup and return
+                // if exception, perform rollback
 
                 _logger.LogInformation("Update completed successfully");
             }

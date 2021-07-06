@@ -1,5 +1,4 @@
 ﻿using System;
-using Hangfire.Logging;
 using Kavita.Common.Disk;
 using Microsoft.Extensions.Logging;
 
