@@ -9,16 +9,15 @@ namespace Kavita.Update
 {
     public class UpdateApp
     {
-        private readonly IInstallUpdateService _installUpdateService;
+        private readonly Kavita.Update.UpdateEngine.InstallUpdateService _installUpdateService;
         private readonly IProcessProvider _processProvider;
-
-        //private static readonly Logger Logger = GetLogger(typeof(UpdateApp));
+        
         private readonly ILoggerFactory _logfactory;
         private static ILogger _logger;
 
         private static IContainer _container;
 
-        public UpdateApp(IInstallUpdateService installUpdateService, IProcessProvider processProvider)
+        public UpdateApp(Kavita.Update.UpdateEngine.InstallUpdateService installUpdateService, IProcessProvider processProvider)
         {
             _installUpdateService = installUpdateService;
             _processProvider = processProvider;

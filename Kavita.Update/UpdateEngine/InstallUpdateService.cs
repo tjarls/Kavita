@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using Hangfire.Logging;
 using Kavita.Common.Disk;
 using Kavita.Common.EnvironmentInfo;
 using Kavita.Common.Extensions;
@@ -13,14 +12,12 @@ namespace Kavita.Update.UpdateEngine
     {
         void Start(string installationFolder, int processId);
     }
-    public class InstallUpdateService
+    public class InstallUpdateService : IInstallUpdateService
     {
-        private readonly IDiskProvider _diskService;
+        private readonly IDiskService _diskService;
         private readonly IDiskTransferService _diskTransferService;
-        private readonly IDetectApplicationType _detectApplicationType;
         private readonly IDetectExistingVersion _detectExistingVersion;
-        private readonly ITerminateNzbDrone _terminateNzbDrone;
-        private readonly IAppFolderInfo _appFolderInfo;
+        private readonly ITerminateKavita _terminateKavita;
         private readonly IBackupAndRestore _backupAndRestore;
         private readonly IBackupAppData _backupAppData;
         private readonly IStartKavita _startKavita;
@@ -29,10 +26,8 @@ namespace Kavita.Update.UpdateEngine
 
         public InstallUpdateService(IDiskService diskService,
             IDiskTransferService diskTransferService,
-            IDetectApplicationType detectApplicationType,
             IDetectExistingVersion detectExistingVersion,
-            ITerminateNzbDrone terminateNzbDrone,
-            IAppFolderInfo appFolderInfo,
+            ITerminateKavita terminateKavita,
             IBackupAndRestore backupAndRestore,
             IBackupAppData backupAppData,
             IStartKavita startKavita,
@@ -41,10 +36,8 @@ namespace Kavita.Update.UpdateEngine
         {
             _diskService = diskService;
             _diskTransferService = diskTransferService;
-            _detectApplicationType = detectApplicationType;
             _detectExistingVersion = detectExistingVersion;
-            _terminateNzbDrone = terminateNzbDrone;
-            _appFolderInfo = appFolderInfo;
+            _terminateKavita = terminateKavita;
             _backupAndRestore = backupAndRestore;
             _backupAppData = backupAppData;
             _startKavita = startKavita;
@@ -77,16 +70,16 @@ namespace Kavita.Update.UpdateEngine
             }
 
             _logger.LogInformation("Verifying Update Folder");
-            if (!_diskService.FolderExists(_appFolderInfo.GetUpdatePackageFolder()))
+            if (!_diskService.FolderExists(BackupAndRestore.UpdateDirectory))
             {
-                throw new DirectoryNotFoundException("Update folder doesn't exist " + _appFolderInfo.GetUpdatePackageFolder());
+                throw new DirectoryNotFoundException("Update folder doesn't exist " + BackupAndRestore.UpdateDirectory);
             }
         }
 
         public void Start(string installationFolder, int processId)
         {
             _logger.LogInformation("Installation Folder: {0}", installationFolder);
-            _logger.LogInformation("Updating Lidarr from version {0} to version {1}", _detectExistingVersion.GetExistingVersion(installationFolder), BuildInfo.Version);
+            _logger.LogInformation("Updating Kavita from version {0} to version {1}", _detectExistingVersion.GetExistingVersion(installationFolder), BuildInfo.Version);
 
             Verify(installationFolder, processId);
 
@@ -96,14 +89,11 @@ namespace Kavita.Update.UpdateEngine
                 _logger.LogInformation("Fixed Installation Folder: {0}", installationFolder);
             }
 
-            var appType = _detectApplicationType.GetAppType();
-
-            _processProvider.FindProcessByName(ProcessProvider.LIDARR_CONSOLE_PROCESS_NAME);
-            _processProvider.FindProcessByName(ProcessProvider.LIDARR_PROCESS_NAME);
+            _processProvider.FindProcessByName(ProcessProvider.KAVITA_PROCESS_NAME);
 
             if (OsInfo.IsWindows)
             {
-                _terminateNzbDrone.Terminate(processId);
+                _terminateKavita.Terminate(processId);
             }
 
             try
@@ -113,9 +103,9 @@ namespace Kavita.Update.UpdateEngine
 
                 if (OsInfo.IsWindows)
                 {
-                    if (_processProvider.Exists(ProcessProvider.LIDARR_CONSOLE_PROCESS_NAME) || _processProvider.Exists(ProcessProvider.LIDARR_PROCESS_NAME))
+                    if (_processProvider.Exists(ProcessProvider.KAVITA_PROCESS_NAME))
                     {
-                        _logger.LogError("Kavita was restarted prematurely by external process.");
+                        _logger.LogError("Kavita was restarted prematurely by external process");
                         return;
                     }
                 }
@@ -123,17 +113,17 @@ namespace Kavita.Update.UpdateEngine
                 try
                 {
                     _logger.LogInformation("Copying new files to target folder");
-                    _diskTransferService.MirrorFolder(_appFolderInfo.GetUpdatePackageFolder(), installationFolder);
+                    _diskTransferService.MirrorFolder(BackupAndRestore.UpdateDirectory, installationFolder);
 
-                    // Set executable flag on Lidarr app
+                    // Set executable flag on Kavita app
                     if (OsInfo.IsOsx || (OsInfo.IsLinux && PlatformInfo.IsNetCore))
                     {
-                        _diskService.SetFilePermissions(Path.Combine(installationFolder, "Lidarr"), "755", null);
+                        // TODO: _diskService.SetFilePermissions(Path.Combine(installationFolder, "Kavita"), "755", null);
                     }
                 }
                 catch (Exception e)
                 {
-                    _logger.LogError(e, "Failed to copy upgrade package to target folder.");
+                    _logger.LogError(e, "Failed to copy upgrade package to target folder");
                     _backupAndRestore.Restore(installationFolder);
                     throw;
                 }
@@ -142,27 +132,27 @@ namespace Kavita.Update.UpdateEngine
             {
                 if (OsInfo.IsWindows)
                 {
-                    _startKavita.Start(appType, installationFolder);
+                    _startKavita.Start(installationFolder);
                 }
                 else
                 {
-                    _terminateNzbDrone.Terminate(processId);
+                    _terminateKavita.Terminate(processId);
 
-                    _logger.LogInformation("Waiting for external auto-restart.");
+                    _logger.LogInformation("Waiting for external auto-restart");
                     for (int i = 0; i < 10; i++)
                     {
                         System.Threading.Thread.Sleep(1000);
 
-                        if (_processProvider.Exists(ProcessProvider.LIDARR_PROCESS_NAME))
+                        if (_processProvider.Exists(ProcessProvider.KAVITA_PROCESS_NAME))
                         {
-                            _logger.LogInformation("Lidarr was restarted by external process.");
+                            _logger.LogInformation("Kavita was restarted by external process");
                             break;
                         }
                     }
 
-                    if (!_processProvider.Exists(ProcessProvider.LIDARR_PROCESS_NAME))
+                    if (!_processProvider.Exists(ProcessProvider.KAVITA_PROCESS_NAME))
                     {
-                        _startKavita.Start(appType, installationFolder);
+                        _startKavita.Start(installationFolder);
                     }
                 }
             }

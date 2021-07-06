@@ -20,7 +20,10 @@ namespace Kavita.Common.Disk
         long GetFileSize(string path);
         void DeleteFile(string path);
         void DeleteFolder(string path, bool recursive);
-        
+        bool FolderEmpty(string path);
+        void CreateFolder(string path);
+        void EmptyFolder(string path);
+
     }
     public class DiskService : IDiskService
     {
@@ -105,6 +108,33 @@ namespace Kavita.Common.Disk
             return GetFiles(path, SearchOption.AllDirectories).Sum(e => _fileSystem.FileInfo.FromFileName(e).Length);
         }
 
+        public void CreateFolder(string path)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void EmptyFolder(string path)
+        {
+            //Ensure.That(path, () => path).IsValidPath();
+
+            foreach (var file in GetFiles(path, SearchOption.TopDirectoryOnly))
+            {
+                DeleteFile(file);
+            }
+
+            foreach (var directory in GetDirectories(path))
+            {
+                DeleteFolder(directory, true);
+            }
+        }
+        
+        public string[] GetDirectories(string path)
+        {
+            //Ensure.That(path, () => path).IsValidPath();
+
+            return _fileSystem.Directory.GetDirectories(path);
+        }
+
         public long GetFileSize(string path)
         {
             //Ensure.That(path, () => path).IsValidPath();
@@ -132,7 +162,14 @@ namespace Kavita.Common.Disk
 
             _fileSystem.File.Delete(path);
         }
-        
+
+        public bool FolderEmpty(string path)
+        {
+            //Ensure.That(path, () => path).IsValidPath();
+
+            return _fileSystem.Directory.EnumerateFileSystemEntries(path).Empty();
+        }
+
         private static void RemoveReadOnly(string path)
         {
             if (File.Exists(path))

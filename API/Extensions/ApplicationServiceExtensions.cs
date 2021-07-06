@@ -8,6 +8,7 @@ using API.Services.Tasks;
 using Kavita.Common;
 using Kavita.Common.Disk;
 using Kavita.Common.EnvironmentInfo;
+using Kavita.Common.Processes;
 using Kavita.Common.Update;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -45,6 +46,7 @@ namespace API.Extensions
             services.AddScoped<IDiskService, DiskService>();
             services.AddScoped<IFileSystem, FileSystem>();
             services.AddScoped<IVerifyUpdates, UpdateVerification>();
+            services.AddScoped<IProcessProvider, ProcessProvider>();
 
             services.AddSqLite(config, env);
 

@@ -1,5 +1,7 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Text.RegularExpressions;
+using Kavita.Common.Disk;
 using Kavita.Common.EnvironmentInfo;
 
 namespace Kavita.Common.Extensions
@@ -79,6 +81,46 @@ namespace Kavita.Common.Extensions
         public static string ProcessNameToExe(this string processName)
         {
             return processName.ProcessNameToExe(PlatformInfo.Platform);
+        }
+        
+        public static bool PathEquals(this string firstPath, string secondPath, StringComparison? comparison = null)
+        {
+            if (!comparison.HasValue)
+            {
+                comparison = DiskService.PathStringComparison;
+            }
+
+            if (firstPath.Equals(secondPath, comparison.Value))
+            {
+                return true;
+            }
+
+            return string.Equals(firstPath.CleanFilePath(), secondPath.CleanFilePath(), comparison.Value);
+        }
+        
+        public static string CleanFilePath(this string path)
+        {
+            //Ensure.That(path, () => path).IsNotNullOrWhiteSpace();
+            //Ensure.That(path, () => path).IsValidPath();
+
+            var info = new FileInfo(path.Trim());
+            return info.FullName.CleanFilePathBasic();
+        }
+        
+        public static string CleanFilePathBasic(this string path)
+        {
+            //UNC
+            if (OsInfo.IsWindows && path.StartsWith(@"\\"))
+            {
+                return path.TrimEnd('/', '\\', ' ');
+            }
+
+            if (OsInfo.IsNotWindows && path.TrimEnd('/').Length == 0)
+            {
+                return "/";
+            }
+
+            return path.TrimEnd('/').Trim('\\', ' ');
         }
     }
 }

@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using Kavita.Common.EnvironmentInfo;
 using Kavita.Common.Model;
+using Microsoft.Extensions.Logging;
 using NLog;
 
 namespace Kavita.Common.Processes
@@ -33,12 +34,11 @@ namespace Kavita.Common.Processes
     
     public class ProcessProvider : IProcessProvider
     {
-        private readonly Logger _logger;
+        private readonly ILogger<ProcessProvider> _logger;
 
-        public const string LIDARR_PROCESS_NAME = "Lidarr";
-        public const string LIDARR_CONSOLE_PROCESS_NAME = "Lidarr.Console";
+        public const string KAVITA_PROCESS_NAME = "Kavita";
 
-        public ProcessProvider(Logger logger)
+        public ProcessProvider(ILogger<ProcessProvider> logger)
         {
             _logger = logger;
         }
@@ -70,17 +70,17 @@ namespace Kavita.Common.Processes
 
         public ProcessInfo GetProcessById(int id)
         {
-            _logger.Debug("Finding process with Id:{0}", id);
+            _logger.LogDebug("Finding process with Id:{0}", id);
 
             var processInfo = ConvertToProcessInfo(Process.GetProcesses().FirstOrDefault(p => p.Id == id));
 
             if (processInfo == null)
             {
-                _logger.Warn("Unable to find process with ID {0}", id);
+                _logger.LogWarning("Unable to find process with ID {0}", id);
             }
             else
             {
-                _logger.Debug("Found process {0}", processInfo.ToString());
+                _logger.LogDebug("Found process {0}", processInfo.ToString());
             }
 
             return processInfo;
@@ -93,7 +93,7 @@ namespace Kavita.Common.Processes
 
         public void OpenDefaultBrowser(string url)
         {
-            _logger.Info("Opening URL [{0}]", url);
+            _logger.LogInformation("Opening URL [{0}]", url);
 
             var process = new Process
             {
@@ -127,18 +127,18 @@ namespace Kavita.Common.Processes
                 {
                     try
                     {
-                        _logger.Trace("Setting environment variable '{0}' to '{1}'", environmentVariable.Key, environmentVariable.Value);
+                        _logger.LogTrace("Setting environment variable '{0}' to '{1}'", environmentVariable.Key, environmentVariable.Value);
                         startInfo.EnvironmentVariables.Add(environmentVariable.Key.ToString(), environmentVariable.Value.ToString());
                     }
                     catch (Exception e)
                     {
                         if (environmentVariable.Value == null)
                         {
-                            _logger.Error(e, "Unable to set environment variable '{0}', value is null", environmentVariable.Key);
+                            _logger.LogError(e, "Unable to set environment variable '{0}', value is null", environmentVariable.Key);
                         }
                         else
                         {
-                            _logger.Error(e, "Unable to set environment variable '{0}'", environmentVariable.Key);
+                            _logger.LogError(e, "Unable to set environment variable '{0}'", environmentVariable.Key);
                         }
 
                         throw;
@@ -195,7 +195,7 @@ namespace Kavita.Common.Processes
         {
             (path, args) = GetPathAndArgs(path, args);
 
-            _logger.Debug("Starting {0} {1}", path, args);
+            _logger.LogDebug("Starting {0} {1}", path, args);
 
             var startInfo = new ProcessStartInfo(path, args);
             startInfo.CreateNoWindow = noWindow;
@@ -228,7 +228,7 @@ namespace Kavita.Common.Processes
 
         public void WaitForExit(Process process)
         {
-            _logger.Debug("Waiting for process {0} to exit.", process.ProcessName);
+            _logger.LogDebug("Waiting for process {0} to exit.", process.ProcessName);
 
             process.WaitForExit();
         }
@@ -237,7 +237,7 @@ namespace Kavita.Common.Processes
         {
             var process = Process.GetProcessById(processId);
 
-            _logger.Info("Updating [{0}] process priority from {1} to {2}",
+            _logger.LogInformation("Updating [{0}] process priority from {1} to {2}",
                         process.ProcessName,
                         process.PriorityClass,
                         priority);
@@ -251,7 +251,7 @@ namespace Kavita.Common.Processes
 
             if (process == null)
             {
-                _logger.Warn("Cannot find process with id: {0}", processId);
+                _logger.LogWarning("Cannot find process with id: {0}", processId);
                 return;
             }
 
@@ -259,32 +259,32 @@ namespace Kavita.Common.Processes
 
             if (process.Id != Process.GetCurrentProcess().Id && process.HasExited)
             {
-                _logger.Debug("Process has already exited");
+                _logger.LogDebug("Process has already exited");
                 return;
             }
 
-            _logger.Info("[{0}]: Killing process", process.Id);
+            _logger.LogInformation("[{0}]: Killing process", process.Id);
             process.Kill();
-            _logger.Info("[{0}]: Waiting for exit", process.Id);
+            _logger.LogInformation("[{0}]: Waiting for exit", process.Id);
             process.WaitForExit();
-            _logger.Info("[{0}]: Process terminated successfully", process.Id);
+            _logger.LogInformation("[{0}]: Process terminated successfully", process.Id);
         }
 
         public void KillAll(string processName)
         {
             var processes = GetProcessesByName(processName);
 
-            _logger.Debug("Found {0} processes to kill", processes.Count);
+            _logger.LogDebug("Found {0} processes to kill", processes.Count);
 
             foreach (var processInfo in processes)
             {
                 if (processInfo.Id == Process.GetCurrentProcess().Id)
                 {
-                    _logger.Debug("Tried killing own process, skipping: {0} [{1}]", processInfo.Id, processInfo.ProcessName);
+                    _logger.LogDebug("Tried killing own process, skipping: {0} [{1}]", processInfo.Id, processInfo.ProcessName);
                     continue;
                 }
 
-                _logger.Debug("Killing process: {0} [{1}]", processInfo.Id, processInfo.ProcessName);
+                _logger.LogDebug("Killing process: {0} [{1}]", processInfo.Id, processInfo.ProcessName);
                 Kill(processInfo.Id);
             }
         }
@@ -319,7 +319,7 @@ namespace Kavita.Common.Processes
             }
             catch (Win32Exception e)
             {
-                _logger.Warn(e, "Couldn't get process info for " + process.ProcessName);
+                _logger.LogWarning(e, "Couldn't get process info for " + process.ProcessName);
             }
 
             return processInfo;
@@ -348,13 +348,13 @@ namespace Kavita.Common.Processes
             var processes = Process.GetProcessesByName(name)
                                    .Union(monoProcesses).ToList();
 
-            _logger.Debug("Found {0} processes with the name: {1}", processes.Count, name);
+            _logger.LogDebug("Found {0} processes with the name: {1}", processes.Count, name);
 
             try
             {
                 foreach (var process in processes)
                 {
-                    _logger.Debug(" - [{0}] {1}", process.Id, process.ProcessName);
+                    _logger.LogDebug(" - [{0}] {1}", process.Id, process.ProcessName);
                 }
             }
             catch

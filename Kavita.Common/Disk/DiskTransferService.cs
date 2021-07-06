@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
 using Kavita.Common.Extensions;
@@ -8,8 +9,8 @@ namespace Kavita.Common.Disk
 {
     public interface IDiskTransferService
     {
-        //TransferMode TransferFolder(string sourcePath, string targetPath, TransferMode mode);
-        //TransferMode TransferFile(string sourcePath, string targetPath, TransferMode mode, bool overwrite = false);
+        TransferMode TransferFolder(string sourcePath, string targetPath, TransferMode mode);
+        TransferMode TransferFile(string sourcePath, string targetPath, TransferMode mode, bool overwrite = false);
         int MirrorFolder(string sourcePath, string targetPath);
     }
     
@@ -174,9 +175,59 @@ namespace Kavita.Common.Disk
                 }
             }
         }
-        
-         public TransferMode TransferFile(string sourcePath, string targetPath, TransferMode mode, bool overwrite = false)
+
+        public TransferMode TransferFolder(string sourcePath, string targetPath, TransferMode mode)
         {
+            return TransferFile(sourcePath, targetPath, mode, false);
+        }
+
+        public TransferMode TransferFile(string sourcePath, string targetPath, TransferMode mode, bool overwrite = false)
+        {
+            //Ensure.That(sourcePath, () => sourcePath).IsValidPath();
+            //Ensure.That(targetPath, () => targetPath).IsValidPath();
+
+            sourcePath = ResolveRealParentPath(sourcePath);
+            targetPath = ResolveRealParentPath(targetPath);
+
+            _logger.LogDebug("{0} [{1}] > [{2}]", mode, sourcePath, targetPath);
+
+            var originalSize = _diskService.GetFileSize(sourcePath);
+
+            if (sourcePath == targetPath)
+            {
+                throw new IOException($"Source and destination can't be the same {sourcePath}");
+            }
+
+            if (sourcePath.PathEquals(targetPath, StringComparison.InvariantCultureIgnoreCase))
+            {
+                if (mode.HasFlag(TransferMode.Copy))
+                {
+                    throw new IOException(string.Format("Source and destination can't be the same {0}", sourcePath));
+                }
+
+                if (mode.HasFlag(TransferMode.Move))
+                {
+                    var tempPath = sourcePath + ".backup~";
+
+                    // _diskService.MoveFile(sourcePath, tempPath, true);
+                    // try
+                    // {
+                    //     ClearTargetPath(sourcePath, targetPath, overwrite);
+                    //
+                    //     _diskProvider.MoveFile(tempPath, targetPath);
+                    //
+                    //     return TransferMode.Move;
+                    // }
+                    // catch
+                    // {
+                    //     RollbackMove(sourcePath, tempPath);
+                    //     throw;
+                    // }
+                    return TransferMode.Move;
+                }
+
+                return TransferMode.None;
+            }
             return TransferMode.None;
         }
     }

@@ -8,7 +8,7 @@ namespace Kavita.Update.UpdateEngine
 {
     public interface IStartKavita
     {
-        void Start(AppType appType, string installationFolder);
+        void Start(string installationFolder);
     }
     public class StartKavita : IStartKavita
     {
@@ -24,31 +24,31 @@ namespace Kavita.Update.UpdateEngine
             _logger = logger;
         }
         
-        public void Start(AppType appType, string installationFolder)
+        public void Start(string installationFolder)
         {
             _logger.LogInformation("Starting Kavita");
             StartWinform(installationFolder);
             return;
-            if (appType == AppType.Service)
-            {
-                try
-                {
-                    StartService();
-                }
-                catch (InvalidOperationException e)
-                {
-                    _logger.LogWarning(e, "Couldn't start Kavita Service (Most likely due to permission issues). Falling back to console");
-                    StartConsole(installationFolder);
-                }
-            }
-            else if (appType == AppType.Console)
-            {
-                StartConsole(installationFolder);
-            }
-            else
-            {
-                StartWinform(installationFolder);
-            }
+            // if (appType == AppType.Service)
+            // {
+            //     try
+            //     {
+            //         StartService();
+            //     }
+            //     catch (InvalidOperationException e)
+            //     {
+            //         _logger.LogWarning(e, "Couldn't start Kavita Service (Most likely due to permission issues). Falling back to console");
+            //         StartConsole(installationFolder);
+            //     }
+            // }
+            // else if (appType == AppType.Console)
+            // {
+            //     StartConsole(installationFolder);
+            // }
+            // else
+            // {
+            //     StartWinform(installationFolder);
+            // }
         }
 
         private void StartService()
