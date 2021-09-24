@@ -327,6 +327,15 @@ namespace API.Parser
             RegexTimeout),
         };
 
+        private static readonly Regex[] MagazineSeriesRegex = new[]
+        {
+            // Imagine FX - 2012 01
+            new Regex(
+                @"(?<Series>.+)( -\.?)",
+                RegexOptions.IgnoreCase | RegexOptions.Compiled,
+            RegexTimeout),
+        };
+
         private static readonly Regex[] ComicVolumeRegex = new[]
         {
             // // 04 - Asterix the Gladiator (1964) (Digital-Empire) (WebP by Doc MaKS)
@@ -414,6 +423,15 @@ namespace API.Parser
             // Amazing Man Comics issue #25
             new Regex(
                 @"^(?!Vol)(?<Series>.+?)( |_)i(ssue)( |_) #(?<Chapter>\d*)",
+                RegexOptions.IgnoreCase | RegexOptions.Compiled,
+            RegexTimeout),
+        };
+
+        private static readonly Regex[] MagazineChapterRegex = new[]
+        {
+            // Imagine FX - 2012 01
+            new Regex(
+                @"(?<Series>.+)(?: - )(?<YEAR>\d+)(?: )(?<Chapter>\d+)",
                 RegexOptions.IgnoreCase | RegexOptions.Compiled,
             RegexTimeout),
         };
@@ -569,10 +587,24 @@ namespace API.Parser
             }
             else
             {
+                string chapters;
+                switch (type)
+                {
+                    case LibraryType.Manga:    chapters = ParseChapter(fileName); break;
+                    case LibraryType.Magazine: chapters = ParseMagazineChapter(fileName); break;
+                    default:                   chapters = ParseComicChapter(fileName); break;
+                }
+                string series;
+                switch (type)
+                {
+                    case LibraryType.Manga:    series = ParseSeries(fileName); break;
+                    case LibraryType.Magazine: series = ParseMagazineSeries(fileName); break;
+                    default:                   series = ParseComicSeries(fileName); break;
+                }
                 ret = new ParserInfo()
                 {
-                    Chapters = type == LibraryType.Manga ? ParseChapter(fileName) : ParseComicChapter(fileName),
-                    Series = type == LibraryType.Manga ? ParseSeries(fileName) : ParseComicSeries(fileName),
+                    Chapters = chapters,
+                    Series = series,
                     Volumes = type == LibraryType.Manga ? ParseVolume(fileName) : ParseComicVolume(fileName),
                     Filename = fileName,
                     Format = ParseFormat(filePath),
@@ -782,7 +814,22 @@ namespace API.Parser
 
             return string.Empty;
         }
+        public static string ParseMagazineSeries(string filename)
+        {
+            foreach (var regex in MagazineSeriesRegex)
+            {
+                var matches = regex.Matches(filename);
+                foreach (Match match in matches)
+                {
+                    if (match.Groups["Series"].Success && match.Groups["Series"].Value != string.Empty)
+                    {
+                        return CleanTitle(match.Groups["Series"].Value);
+                    }
+                }
+            }
 
+            return string.Empty;
+        }
         public static string ParseVolume(string filename)
         {
             foreach (var regex in MangaVolumeRegex)
@@ -874,6 +921,34 @@ namespace API.Parser
         public static string ParseComicChapter(string filename)
         {
             foreach (var regex in ComicChapterRegex)
+            {
+                var matches = regex.Matches(filename);
+                foreach (Match match in matches)
+                {
+                    if (match.Groups["Chapter"].Success && match.Groups["Chapter"] != Match.Empty)
+                    {
+                        var value = match.Groups["Chapter"].Value;
+
+                        if (value.Contains("-"))
+                        {
+                            var tokens = value.Split("-");
+                            var from = RemoveLeadingZeroes(tokens[0]);
+                            var to = RemoveLeadingZeroes(tokens[1]);
+                            return $"{from}-{to}";
+                        }
+
+                        return RemoveLeadingZeroes(match.Groups["Chapter"].Value);
+                    }
+
+                }
+            }
+
+            return DefaultChapter;
+        }
+
+        public static string ParseMagazineChapter(string filename)
+        {
+            foreach (var regex in MagazineChapterRegex)
             {
                 var matches = regex.Matches(filename);
                 foreach (Match match in matches)
