@@ -24,6 +24,11 @@ namespace API.Parser
         /// </summary>
         public string Volumes { get; set; } = "";
         /// <summary>
+        /// Represents the date of from a file.
+        /// <example>ImagineFX - 2008 08</example>
+        /// </summary>
+        public string Dates { get; set; } = "";
+        /// <summary>
         /// Filename of the underlying file
         /// <example>Beastars v01 (digital).cbz</example>
         /// </summary>
@@ -74,6 +79,7 @@ namespace API.Parser
             if (info2 == null) return;
             Chapters = string.IsNullOrEmpty(Chapters) || Chapters == "0" ? info2.Chapters: Chapters;
             Volumes = string.IsNullOrEmpty(Volumes) || Volumes == "0" ? info2.Volumes : Volumes;
+            Dates = string.IsNullOrEmpty(Dates) || Dates == "0.0.0" ? info2.Dates : Dates;
             Edition = string.IsNullOrEmpty(Edition) ? info2.Edition : Edition;
             Title = string.IsNullOrEmpty(Title) ? info2.Title : Title;
             Series = string.IsNullOrEmpty(Series) ? info2.Series : Series;

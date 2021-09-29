@@ -678,7 +678,7 @@ namespace API.Parser
         /// <param name="ret">Expects a non-null ParserInfo which this method will populate</param>
         public static void ParseFromFallbackFolders(string filePath, string rootPath, LibraryType type, ref ParserInfo ret)
         {
-          var fallbackFolders = DirectoryService.GetFoldersTillRoot(rootPath, filePath).ToList();
+            var fallbackFolders = DirectoryService.GetFoldersTillRoot(rootPath, filePath).ToList();
             for (var i = 0; i < fallbackFolders.Count; i++)
             {
                 var folder = fallbackFolders[i];
@@ -955,16 +955,6 @@ namespace API.Parser
                 {
                     if (match.Groups["Chapter"].Success && match.Groups["Chapter"] != Match.Empty)
                     {
-                        var value = match.Groups["Chapter"].Value;
-
-                        if (value.Contains("-"))
-                        {
-                            var tokens = value.Split("-");
-                            var from = RemoveLeadingZeroes(tokens[0]);
-                            var to = RemoveLeadingZeroes(tokens[1]);
-                            return $"{from}-{to}";
-                        }
-
                         return RemoveLeadingZeroes(match.Groups["Chapter"].Value);
                     }
 
@@ -1103,6 +1093,7 @@ namespace API.Parser
         {
             return ArchiveFileRegex.IsMatch(Path.GetExtension(filePath));
         }
+
         public static bool IsBook(string filePath)
         {
             return BookFileRegex.IsMatch(Path.GetExtension(filePath));
@@ -1157,7 +1148,6 @@ namespace API.Parser
         {
             return path.Contains("__MACOSX");
         }
-
 
         public static bool IsEpub(string filePath)
         {
