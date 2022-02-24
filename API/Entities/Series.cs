@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using API.Entities.Enums;
 using API.Entities.Interfaces;
@@ -66,6 +66,7 @@ namespace API.Entities
         public List<Volume> Volumes { get; set; }
         public Library Library { get; set; }
         public int LibraryId { get; set; }
+        public List<MangaFile> MangaFiles { get; set; }
 
     }
 }

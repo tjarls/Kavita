@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -281,6 +281,8 @@ public class SeriesRepository : ISeriesRepository
             .Select(s => s.Id)
             .ToList();
 
+        var chapterIds = await GetChapterIdsForSeriesAsync(seriesIds);
+
         result.Libraries = await _context.Library
             .Where(l => libraryIds.Contains(l.Id))
             .Where(s => EF.Functions.Like(s.Name, $"%{searchQuery}%"))
@@ -293,7 +295,10 @@ public class SeriesRepository : ISeriesRepository
             .Where(s => libraryIds.Contains(s.LibraryId))
             .Where(s => EF.Functions.Like(s.Name, $"%{searchQuery}%")
                         || EF.Functions.Like(s.OriginalName, $"%{searchQuery}%")
-                        || EF.Functions.Like(s.LocalizedName, $"%{searchQuery}%"))
+                        || EF.Functions.Like(s.LocalizedName, $"%{searchQuery}%")
+                        || s.Volumes.Any(v => v.Chapters.Any(c => EF.Functions.Like(c.Title, $"%{searchQuery}%")
+                        || EF.Functions.Like(c.TitleName, $"%{searchQuery}%"))
+            ))
             .Include(s => s.Library)
             .OrderBy(s => s.SortName)
             .AsNoTracking()
@@ -301,7 +306,28 @@ public class SeriesRepository : ISeriesRepository
             .ProjectTo<SearchResultDto>(_mapper.ConfigurationProvider)
             .ToListAsync();
 
+        result.Chapters = await _context.Chapter
+               .Where(T => EF.Functions.Like(T.Title, $"%{searchQuery}%")
+                        || EF.Functions.Like(T.TitleName, $"%{searchQuery}%"))
+               .Where(chapter => chapterIds.Contains(chapter.Id))
+               .AsSplitQuery()
+               .ProjectTo<ChapterDto>(_mapper.ConfigurationProvider)
+               .ToListAsync();
+
+        result.FileSearchResult = await _context.Series
+                    .Where(s => libraryIds.Contains(s.LibraryId))
+                    .Include(s => s.Library)
+                    .Include(s => s.Volumes)
+                    .ThenInclude(v => v.Chapters)
+                    .ThenInclude(c => c.Files.Where(f => EF.Functions.Like(f.FilePath, $"%{searchQuery}%")
+                    || EF.Functions.Like(f.Chapter.Title, $"%{searchQuery}%")
+                    || EF.Functions.Like(f.Chapter.TitleName, $"%{searchQuery}%")))
+                    .SelectMany(s => s.Name)
+                    .AsSplitQuery()
+                    .ToListAsync();
+
         result.ReadingLists = await _context.ReadingList
+            .Where(rl => rl.AppUserId == userId || rl.Promoted)
             .Where(rl => rl.AppUserId == userId || rl.Promoted)
             .Where(rl => EF.Functions.Like(rl.Title, $"%{searchQuery}%"))
             .AsSplitQuery()
