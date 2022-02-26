@@ -1,0 +1,17 @@
+*:not(input), *:not(select), *:not(code), *:not(:link), *:not(.ngx-toastr) {
+    color: #dcdcdc !important;
+}
+
+code {
+    color: #e83e8c !important;
+}
+
+:link, a {
+    color: #8db2e5 !important;
+}
+
+img, img[src] {
+  z-index: 1;
+  filter: brightness(0.85) !important;
+  background-color: initial !important;
+}

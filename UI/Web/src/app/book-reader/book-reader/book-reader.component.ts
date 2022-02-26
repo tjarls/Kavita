@@ -261,32 +261,38 @@ export class BookReaderComponent implements OnInit, AfterViewInit, OnDestroy {
     private renderer: Renderer2, private navService: NavService, private toastr: ToastrService, 
     private domSanitizer: DomSanitizer, private bookService: BookService, private memberService: MemberService,
     private scrollService: ScrollService, private utilityService: UtilityService, private libraryService: LibraryService,
-    @Inject(DOCUMENT) private document: Document, private themeService: ThemeService) {
+    @Inject(DOCUMENT) private document: Document, public themeService: ThemeService) {
       this.navService.hideNavBar();
 
-      this.darkModeStyleElem = this.renderer.createElement('style');
-      this.darkModeStyleElem.innerHTML = this.darkModeStyles;
+      // Inject custom styles for dark mode
+      // this.darkModeStyleElem = this.renderer.createElement('style');
+      // this.darkModeStyleElem.id = 'theme-test';
+      // this.darkModeStyleElem.innerHTML = this.darkModeStyles;
+      
+
+
       this.fontFamilies = this.bookService.getFontFamilies();
 
       this.accountService.currentUser$.pipe(take(1)).subscribe(user => {
         if (user) {
           this.user = user;
           
-          if (this.user.preferences.bookReaderFontFamily === undefined) {
-            this.user.preferences.bookReaderFontFamily = 'default';
-          }
-          if (this.user.preferences.bookReaderFontSize === undefined) {
-            this.user.preferences.bookReaderFontSize = 100;
-          }
-          if (this.user.preferences.bookReaderLineSpacing === undefined) {
-            this.user.preferences.bookReaderLineSpacing = 100;
-          }
-          if (this.user.preferences.bookReaderMargin === undefined) {
-            this.user.preferences.bookReaderMargin = 0;
-          }
-          if (this.user.preferences.bookReaderReadingDirection === undefined) {
-            this.user.preferences.bookReaderReadingDirection = ReadingDirection.LeftToRight;
-          }
+          // NOTE: Will this happen anymore? I think we can remove it
+          // if (this.user.preferences.bookReaderFontFamily === undefined) {
+          //   this.user.preferences.bookReaderFontFamily = 'default';
+          // }
+          // if (this.user.preferences.bookReaderFontSize === undefined) {
+          //   this.user.preferences.bookReaderFontSize = 100;
+          // }
+          // if (this.user.preferences.bookReaderLineSpacing === undefined) {
+          //   this.user.preferences.bookReaderLineSpacing = 100;
+          // }
+          // if (this.user.preferences.bookReaderMargin === undefined) {
+          //   this.user.preferences.bookReaderMargin = 0;
+          // }
+          // if (this.user.preferences.bookReaderReadingDirection === undefined) {
+          //   this.user.preferences.bookReaderReadingDirection = ReadingDirection.LeftToRight;
+          // }
 
           this.readingDirection = this.user.preferences.bookReaderReadingDirection;
 
@@ -389,8 +395,10 @@ export class BookReaderComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     this.navService.showNavBar();
 
-    const head = this.document.querySelector('head');
-    this.renderer.removeChild(head, this.darkModeStyleElem);
+    //const head = this.document.querySelector('head');
+    //this.renderer.removeChild(this.document.querySelector('.body-content'), this.darkModeStyleElem);
+
+    // TODO: Unsert theme
 
     if (this.clickToPaginateVisualOverlayTimeout !== undefined) {
       clearTimeout(this.clickToPaginateVisualOverlayTimeout);
@@ -436,6 +444,8 @@ export class BookReaderComponent implements OnInit, AfterViewInit, OnDestroy {
         this.toastr.info('You can modify book settings, save those settings for all books, and view table of contents from the drawer.');
       }
     });
+
+    this.themeService.setBookTheme('dark');
 
     this.init();
   }
@@ -977,10 +987,18 @@ export class BookReaderComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     this.backgroundColor = this.getDarkModeBackgroundColor();
     const head = this.document.querySelector('head');
+    // if (this.darkMode) {
+    //   //this.renderer.appendChild(head, this.darkModeStyleElem)
+    //   console.log('book Content: ', this.document.querySelector('.book-content')); // TODO: Move this to ContentChild
+    //   this.renderer.appendChild(this.document.querySelector('.book-content'), this.darkModeStyleElem);
+    // } else {
+    //   //this.renderer.removeChild(head, this.darkModeStyleElem);
+    //   this.renderer.removeChild(this.document.querySelector('.book-content'), this.darkModeStyleElem);
+    // }
     if (this.darkMode) {
-      this.renderer.appendChild(head, this.darkModeStyleElem)
+      this.themeService.setBookTheme('dark');
     } else {
-      this.renderer.removeChild(head, this.darkModeStyleElem);
+      this.themeService.setBookTheme('white');
     }
   }
 

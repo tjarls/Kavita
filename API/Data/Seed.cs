@@ -51,6 +51,60 @@ namespace API.Data
             },
         };
 
+        public static readonly IList<BookTheme> DefaultBookThemes = new List<BookTheme>
+        {
+            new()
+            {
+                Name = "White",
+                NormalizedName = Parser.Parser.Normalize("White"),
+                ColorHash = "#FFFFFF",
+                Provider = ThemeProvider.System,
+                Contents = @"
+                    .book-content {
+                        background-color: #010409;
+                    }",
+                IsDefault = false,
+            },
+            new()
+            {
+                Name = "Dark",
+                NormalizedName = Parser.Parser.Normalize("Dark"),
+                ColorHash = "#010409",
+                Provider = ThemeProvider.System,
+                Contents = @"
+                    .book-content {
+                        background-color: #010409;
+                    }
+                     *:not(input), *:not(select), *:not(code), *:not(:link), *:not(.ngx-toastr) {
+                        color: #dcdcdc !important;
+                    }
+
+                    code {
+                        color: #e83e8c !important;
+                    }
+
+                    :link, a {
+                        color: #8db2e5 !important;
+                    }
+
+                    img, img[src] {
+                      z-index: 1;
+                      filter: brightness(0.85) !important;
+                      background-color: initial !important;
+                    }",
+                IsDefault = true,
+            },
+            new()
+            {
+                Name = "Black",
+                NormalizedName = Parser.Parser.Normalize("Black"),
+                ColorHash = "#010409",
+                Provider = ThemeProvider.System,
+                Contents = @"",
+                IsDefault = true,
+            },
+        };
+
         public static async Task SeedRoles(RoleManager<AppRole> roleManager)
         {
             var roles = typeof(PolicyConstants)
@@ -81,6 +135,15 @@ namespace API.Data
                 if (existing == null)
                 {
                     await context.SiteTheme.AddAsync(theme);
+                }
+            }
+
+            foreach (var theme in DefaultBookThemes)
+            {
+                var existing = context.SiteTheme.FirstOrDefault(s => s.Name.Equals(theme.Name));
+                if (existing == null)
+                {
+                    await context.BookTheme.AddAsync(theme);
                 }
             }
 

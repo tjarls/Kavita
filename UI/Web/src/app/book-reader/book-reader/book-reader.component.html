@@ -58,6 +58,12 @@
                         <button (click)="toggleClickToPaginate()" class="btn btn-icon" aria-labelledby="tap-pagination"><i class="fa fa-arrows-alt-h {{clickToPaginate ? 'icon-primary-color' : ''}}" aria-hidden="true"></i><span *ngIf="darkMode">&nbsp;{{clickToPaginate ? 'On' : 'Off'}}</span></button>
                     </div>
                     <div class="controls">
+                        <label>Book Theme</label>
+                        <ng-container *ngFor="let bookTheme of themeService.bookThemes$ | async">
+                            <button class="btn btn-outline-secondary" (click)="themeService.setBookTheme(bookTheme.name)">{{bookTheme.name}}</button>
+                        </ng-container>
+                    </div>
+                    <div class="controls">
                         <label id="fullscreen" class="form-label">Fullscreen&nbsp;<i class="fa fa-info-circle" aria-hidden="true" placement="top" [ngbTooltip]="fullscreenTooltip" role="button" tabindex="0" aria-describedby="fullscreen-help"></i></label>
                         <ng-template #fullscreenTooltip>Put reader in fullscreen mode</ng-template>
                         <span class="visually-hidden" id="fullscreen-help">

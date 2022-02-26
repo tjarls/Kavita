@@ -6,10 +6,11 @@ import { SharedModule } from '../shared/shared.module';
 import { SafeStylePipe } from './safe-style.pipe';
 import { ReactiveFormsModule } from '@angular/forms';
 import { NgbProgressbarModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
+import { CustomThemeChooserComponent } from './_modals/custom-theme-chooser/custom-theme-chooser.component';
 
 
 @NgModule({
-  declarations: [BookReaderComponent, SafeStylePipe],
+  declarations: [BookReaderComponent, SafeStylePipe, CustomThemeChooserComponent],
   imports: [
     CommonModule,
     BookReaderRoutingModule,

@@ -5,7 +5,9 @@ import { ChapterInfo } from '../manga-reader/_models/chapter-info';
 import { UtilityService } from '../shared/_services/utility.service';
 import { Chapter } from '../_models/chapter';
 import { PageBookmark } from '../_models/page-bookmark';
+import { ReadingDirection } from '../_models/preferences/reading-direction';
 import { ProgressBookmark } from '../_models/progress-bookmark';
+import { User } from '../_models/user';
 import { Volume } from '../_models/volume';
 
 @Injectable({
@@ -202,4 +204,28 @@ export class ReaderService {
   checkFullscreenMode() {
     return document.fullscreenElement != null;
   }
+
+
+  /**
+   * Ensures the default user preferences exist for the user...TODO: Validate if we can remove
+   */
+  // ensureDefaultUserReadingPreferences(user: User) {
+  //   if (user.preferences.bookReaderFontFamily === undefined) {
+  //     user.preferences.bookReaderFontFamily = 'default';
+  //   }
+  //   if (user.preferences.bookReaderFontSize === undefined) {
+  //     user.preferences.bookReaderFontSize = 100;
+  //   }
+  //   if (user.preferences.bookReaderLineSpacing === undefined) {
+  //     user.preferences.bookReaderLineSpacing = 100;
+  //   }
+  //   if (user.preferences.bookReaderMargin === undefined) {
+  //     user.preferences.bookReaderMargin = 0;
+  //   }
+  //   if (user.preferences.bookReaderReadingDirection === undefined) {
+  //     user.preferences.bookReaderReadingDirection = ReadingDirection.LeftToRight;
+  //   }
+
+
+  // }
 }

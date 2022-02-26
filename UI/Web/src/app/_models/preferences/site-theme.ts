@@ -4,19 +4,19 @@
  export enum ThemeProvider {
     System = 1,
     User = 2
-  }
+}
   
+/**
+ * Theme for the whole instance
+ */
+export interface SiteTheme {
+  id: number;
+  name: string;
+  filePath: string;
+  isDefault: boolean;
+  provider: ThemeProvider;
   /**
-   * Theme for the whole instance
+   * The actual class the root is defined against. It is generated at the backend.
    */
-  export interface SiteTheme {
-    id: number;
-    name: string;
-    filePath: string;
-    isDefault: boolean;
-    provider: ThemeProvider;
-    /**
-     * The actual class the root is defined against. It is generated at the backend.
-     */
-    selector: string;
-  }
+  selector: string;
+}

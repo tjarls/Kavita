@@ -22,8 +22,34 @@ export interface Preferences {
     bookReaderTapToPaginate: boolean;
     bookReaderReadingDirection: ReadingDirection;
 
+    // Book Reader, new stuff (using ? to avoid having to update other areas )
+    bookReaderColorTheme?: string;
+    bookReaderLayoutMode?: BookPageLayoutMode;
+    /**
+     * This mode hides the reading bars and will 
+     */
+    //bookReaderImmersiveMode?: boolean;
+
     // Global
     theme: SiteTheme;
+}
+
+/**
+ * How the content of a book page should render in the reader.
+ */
+export enum BookPageLayoutMode {
+    /**
+     * Renders as the book describes
+     */
+    Original = 1,
+    /**
+     * Provides virtual paging and breaks a page (usually a long chapter) into subpages that fit to height of device
+     */
+    SinglePage = 2,
+    /**
+     * Provides virtual paging and breaks a page (usually a long chapter) into subpages (2 next to each other) that fit to height of device and mimic a real book
+     */
+    DoublePage = 3
 }
 
 export const readingDirections = [{text: 'Left to Right', value: ReadingDirection.LeftToRight}, {text: 'Right to Left', value: ReadingDirection.RightToLeft}];
