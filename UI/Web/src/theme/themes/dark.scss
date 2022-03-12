@@ -87,7 +87,7 @@
     --tagbadge-typeahead-border-color: rgba(239, 239, 239, 0.125);
     --tagbadge-typeahead-text-color: var(--body-text-color);
     --tagbadge-typeahead-bg-color: var(--primary-color);
-    
+
 
     /* List items */
     --list-group-item-text-color: var(--body-text-color); /*rgba(74, 198, 148, 0.9)*/
@@ -168,6 +168,8 @@
 
     /* Slider */
     --slider-text-color: white;
+    --input-range-color: var(--primary-color);
+    --input-range-active-color: var(--primary-color-darker-shade);
 
     /* Manga Reader */
     --manga-reader-overlay-filter: blur(10px);
@@ -186,4 +188,8 @@
     --carousel-header-text-color: var(--body-text-color);
     --carousel-header-text-decoration: none;
     --carousel-hover-header-text-decoration: underline;
+
+    /* Drawer */
+    --drawer-bg-color: #292929;
+    --drawer-text-color: white;
   }

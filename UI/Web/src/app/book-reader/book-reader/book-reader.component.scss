@@ -28,6 +28,16 @@
     src: url(../../../assets/fonts/RocknRoll_One/RocknRollOne-Regular.ttf) format("truetype");
 }
 
+:root {
+    --br-actionbar-button-text-color: #6c757d;
+
+    --accordion-body-bg-color: black;
+    --accordion-header-bg-color: grey;
+    --br-actionbar-button-hover-border-color: #6c757d;
+    --br-actionbar-bg-color: white;
+}
+
+
 $dark-form-background-no-opacity: rgb(1, 4, 9);
 $primary-color: #0062cc;
 
@@ -59,6 +69,8 @@ $primary-color: #0062cc;
     background-image: none !important;
     background-color: #292929 !important;
 
+    --btn-icon-filter: invert(1) grayscale(100%) brightness(200%);
+
     *:not(code), *:not(a) {
         background-color: #292929;
         box-shadow: none;
@@ -88,19 +100,25 @@ $primary-color: #0062cc;
         filter: brightness(0.85) !important;
         background-color: initial !important;
     }
-      
+
     :visited, :visited *, :visited *[class] {color: rgb(211, 138, 138) !important}
     :link:not(cite), :link *:not(cite) {color: #8db2e5 !important}
 }
 
 .reading-bar {
-    background-color: white;
+    background-color: var(--br-actionbar-bg-color);
     overflow: hidden;
     box-shadow: 0 0 6px 0 rgb(0 0 0 / 70%);
 }
 
+.drawer-body {
+    padding-left: 10px;
+    padding-right: 10px;
+    background-color: var(--drawer-bg-color);
+}
+
 .dark-mode {
-    .reading-bar, .book-title, .drawer-body, .drawer-container {
+    .reading-bar, .book-title, .drawer-container {
         background-color: $dark-form-background-no-opacity;
     }
     button {
@@ -110,29 +128,30 @@ $primary-color: #0062cc;
     .btn {
         &.btn-secondary {
             border-color: transparent;
-    
+
             &:hover, &:focus {
                 border-color: #545b62;
             }
         }
-        
+
         &.btn-outline-secondary {
             border-color: transparent;
-    
+
             &:hover, &:focus {
                 border-color: #545b62;
             }
         }
-    
+
         span {
             background-color: unset;
         }
-    
+
         i {
             background-color: unset;
         }
     }
 }
+
 
 ::ng-deep .dark-mode .drawer-container {
     .header, body, *:not(.progress-bar) {
@@ -144,8 +163,8 @@ $primary-color: #0062cc;
     .book-title {
         display: none;
     }
-    
-} 
+
+}
 
 .book-title {
     margin-top: 10px;
@@ -256,24 +275,24 @@ $primary-color: #0062cc;
             border-color: #545b62;
         }
     }
-    
+
     &.btn-outline-secondary {
         border-color: transparent;
         background-color: unset;
 
         &:hover, &:focus {
-            border-color: #545b62;
+            border-color: var(--br-actionbar-button-hover-border-color); // #545b62;
         }
     }
 
     span {
         background-color: unset;
-        color: #6c757d;
+        color: var(--br-actionbar-button-text-color); // #6c757d;
     }
 
     i {
         background-color: unset;
-        color: #6c757d;
+        color: var(--br-actionbar-button-text-color);
     }
 
     &:active {

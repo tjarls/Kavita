@@ -253,7 +253,7 @@ export class BookReaderComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   get drawerBackgroundColor() {
-    return this.darkMode ? '#010409': '#fff';
+    return this.darkMode ? '#292929': '#fff';
   }
 
   constructor(private route: ActivatedRoute, private router: Router, private accountService: AccountService,
