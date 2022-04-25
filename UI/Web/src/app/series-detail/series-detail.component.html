@@ -94,7 +94,7 @@
                         [isLoading]="isLoading"
                         [items]="volumes">
                         <ng-template #cardItem let-item let-position="idx">
-                            <app-card-item class="col-auto p-2" [entity]="item" [title]="item.name" (click)="openVolume(item)"
+                            <app-card-item class="p-2" [entity]="item" [title]="item.name" (click)="openVolume(item)"
                                   [imageUrl]="imageService.getVolumeCoverImage(item.id) + '&offset=' + coverImageOffset"
                                   [read]="item.pagesRead" [total]="item.pages" [actions]="volumeActions" 
                                   (selection)="bulkSelectionService.handleCardSelection('volume', position, volumes.length, $event)" 

@@ -1,0 +1,9 @@
+.card-row {
+
+    &:first-child {
+        padding-left: 0px;
+    }
+    &:not(:first-child) {
+        padding-left: 0.5rem;
+    }
+}

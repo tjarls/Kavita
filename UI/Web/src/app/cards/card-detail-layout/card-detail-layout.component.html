@@ -17,7 +17,7 @@
 
 <ng-container [ngTemplateOutlet]="paginationTemplate" [ngTemplateOutletContext]="{ id: 'top' }"></ng-container>
 
-<ng-container *ngIf="pagination.totalItems > 6 || isMobile; else cardTemplate">
+<!-- <ng-container *ngIf="pagination.totalItems > 6 || isMobile; else cardTemplate">
     <div class="d-flex justify-content-center row g-0 mt-2 mb-2">
         <div class="col-auto ps-1 pe-1 mt-2 mb-2" *ngFor="let item of items; trackBy:trackByIdentity; index as i">
             <ng-container [ngTemplateOutlet]="itemTemplate" [ngTemplateOutletContext]="{ $implicit: item, idx: i }"></ng-container>
@@ -27,21 +27,23 @@
             <ng-container [ngTemplateOutlet]="noDataTemplate"></ng-container>
         </p>
     </div>
-</ng-container>
+</ng-container> -->
+
+<!-- <ng-template #cardTemplate> -->
+    <div class="row row-cols-auto g-0 card-row"> <!--mt-2 -->
+        <div class="col-auto" *ngFor="let item of items; trackBy:trackByIdentity; index as i">
+            <ng-container [ngTemplateOutlet]="itemTemplate" [ngTemplateOutletContext]="{ $implicit: item, idx: i }"></ng-container>
+        </div>
+    
+        <p *ngIf="items.length === 0 && !isLoading">
+            There is no data
+        </p>
+    </div>
+<!-- </ng-template> -->
 
 <ng-container [ngTemplateOutlet]="paginationTemplate" [ngTemplateOutletContext]="{ id: 'bottom' }"></ng-container>
 
-<ng-template #cardTemplate>
-<div class="row g-0 mt-2 mb-2">
-    <div class="col-auto ps-1 pe-1 mt-2 mb-2" *ngFor="let item of items; trackBy:trackByIdentity; index as i">
-        <ng-container [ngTemplateOutlet]="itemTemplate" [ngTemplateOutletContext]="{ $implicit: item, idx: i }"></ng-container>
-    </div>
 
-    <p *ngIf="items.length === 0 && !isLoading">
-        There is no data
-    </p>
-</div>
-</ng-template>
 
 <ng-template #paginationTemplate let-id="id">
 <div class="d-flex justify-content-center mb-0" *ngIf="pagination && items.length > 0">
