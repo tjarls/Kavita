@@ -1,8 +1,8 @@
 <div class="carousel-container" *ngIf="items.length > 0 ">
-    <div>
-        <h3 style="display: inline-block;">
+    <div class="d-flex align-items-center justify-content-between">
+        <h5 style="display: inline-block;">
             <a href="javascript:void(0)" (click)="sectionClicked($event)" class="section-title" [ngClass]="{'non-selectable': !clickableTitle}">{{title}}</a>
-        </h3>
+        </h5>
         <div class="float-end" *ngIf="swiper">
             <button class="btn btn-icon" [disabled]="swiper.isBeginning" (click)="prevPage()"><i class="fa fa-angle-left" aria-hidden="true"></i><span class="visually-hidden">Previous Items</span></button>
             <button class="btn btn-icon" [disabled]="swiper.isEnd" (click)="nextPage()"><i class="fa fa-angle-right" aria-hidden="true"></i><span class="visually-hidden">Next Items</span></button>

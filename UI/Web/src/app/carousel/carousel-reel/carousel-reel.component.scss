@@ -4,11 +4,12 @@
     position: relative;
     display: flex;
     flex-direction: column;
+    margin: 0 0 20px;
 }
 
 .carousel-container {
     .section-title {
-        font-weight: 400;
+        font-weight: 600;
         margin-left: 10px;
         color: var(--carousel-header-text-color);
         text-decoration: var(--carousel-header-text-decoration);

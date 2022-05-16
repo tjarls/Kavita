@@ -52,8 +52,9 @@ $image-width: 160px;
 }
 
 .progress-banner {
-    width: $image-width;
-    height: 5px;
+    width: 158px;
+    height: 4px;
+    margin-top: -4px;
 
     .progress {
         color: var(--card-progress-bar-color);
