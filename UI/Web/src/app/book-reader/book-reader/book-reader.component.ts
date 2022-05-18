@@ -593,6 +593,15 @@ export class BookReaderComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+  @HostListener("wheel", ["$event"])
+  onScroll(event: WheelEvent) {
+    if (event.deltaY > 0){
+      this.movePage(this.readingDirection === ReadingDirection.LeftToRight ? PAGING_DIRECTION.FORWARD : PAGING_DIRECTION.BACKWARDS);
+    } else {
+      this.movePage(this.readingDirection === ReadingDirection.LeftToRight ? PAGING_DIRECTION.BACKWARDS : PAGING_DIRECTION.FORWARD);
+    }
+  }
+
   @HostListener('window:keydown', ['$event'])
   handleKeyPress(event: KeyboardEvent) {
     if (event.key === KEY_CODES.RIGHT_ARROW) {
