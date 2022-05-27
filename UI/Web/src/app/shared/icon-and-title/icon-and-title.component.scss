@@ -1,6 +1,9 @@
 .icon-and-title {
     flex-direction: column;
     min-width: 60px;
+    background-color: var(--side-nav-bg-color);
+    border-radius: 5px;
+    height: 100%;
 }
 
 .icon {

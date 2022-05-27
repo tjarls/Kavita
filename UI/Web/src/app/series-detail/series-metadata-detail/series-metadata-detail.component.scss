@@ -1,0 +1,12 @@
+.meta-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 150px);
+    grid-column-gap: 0.25rem;
+    grid-row-gap: 0.5rem;
+    justify-content: space-around;
+}
+
+.meta-pill {
+    width: 100%;
+    height: 100%;
+}
