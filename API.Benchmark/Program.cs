@@ -16,6 +16,7 @@ public static class Program
         //BenchmarkRunner.Run<TestBenchmark>();
         //BenchmarkRunner.Run<ParserBenchmarks>();
         BenchmarkRunner.Run<EpubBenchmark>();
+        BenchmarkRunner.Run<CleanTitleBenchmarks>();
 
     }
 }
